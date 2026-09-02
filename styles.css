@@ -1,0 +1,49 @@
+# TikTok Exchange Demo — Vercel Mobile Web Version
+
+This is an entertainment/demo-only mobile webpage. It does **not** send TikTok Coins or perform real transactions.
+
+## What is included
+- Mobile-first Exchange screen
+- Exact TikTok @username lookup attempt using the public profile page
+- Real public avatar/display name when TikTok allows the server request
+- Coin selection + custom coin amount
+- Automatic deducted-amount calculation
+- Processing animation
+- Exchange Completed receipt screen
+- Small DEMO / ENTERTAINMENT ONLY disclosure
+
+## Fastest deployment with Vercel
+
+### Option 1 — GitHub + Vercel (recommended)
+1. Create a new GitHub repository.
+2. Upload **all files inside this folder** to the repository root.
+3. Sign in to Vercel.
+4. Click **Add New → Project**.
+5. Import the GitHub repository.
+6. Framework Preset: **Other** (usually auto-detected).
+7. Do not set a Build Command or Output Directory.
+8. Click **Deploy**.
+9. Vercel will give you a public HTTPS URL such as `https://your-project.vercel.app`.
+10. Open that URL directly on iPhone or Android.
+
+### Option 2 — Vercel CLI
+Install Node.js, then:
+
+```bash
+npm i -g vercel
+cd tiktok_exchange_vercel
+vercel
+```
+
+Follow the prompts. For production:
+
+```bash
+vercel --prod
+```
+
+## Mobile home-screen use
+- iPhone Safari: Share → Add to Home Screen
+- Android Chrome: menu ⋮ → Add to Home screen / Install app
+
+## Important limitation
+TikTok does not provide a normal public API for arbitrary global user search. This demo performs an **exact @username lookup** against the public TikTok profile page. TikTok may sometimes block server-side requests, so a lookup can fail even when the username exists.

@@ -1,0 +1,9 @@
+{
+  "name": "tiktok-exchange-demo-vercel",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  }
+}

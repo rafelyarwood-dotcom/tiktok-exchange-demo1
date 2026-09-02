@@ -1,0 +1,75 @@
+const RATE = 0.012136;
+let selectedUser = null;
+
+const $ = (id) => document.getElementById(id);
+const screens = ['exchangeScreen','processingScreen','completeScreen'];
+function show(id){ screens.forEach(s => $(s).classList.toggle('active', s===id)); }
+function fmtCoins(n){ return Math.max(0, Number(n)||0).toLocaleString('en-US'); }
+function fmtMoney(n){ return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n); }
+function coins(){ return Math.max(0, parseInt($('customCoins').value.replace(/\D/g,''),10)||0); }
+function refresh(){
+  $('coinsPreview').textContent = fmtCoins(coins());
+  $('amountPreview').textContent = fmtMoney(coins()*RATE);
+}
+
+$('customCoins').addEventListener('input', e => {
+  e.target.value = e.target.value.replace(/\D/g,'');
+  document.querySelectorAll('.amount').forEach(b=>b.classList.remove('selected'));
+  refresh();
+});
+
+document.querySelectorAll('.amount').forEach(btn => btn.addEventListener('click',()=>{
+  document.querySelectorAll('.amount').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  $('customCoins').value = btn.dataset.coins;
+  refresh();
+}));
+
+$('username').addEventListener('keydown', e => { if(e.key==='Enter') $('searchBtn').click(); });
+
+$('searchBtn').addEventListener('click', async ()=>{
+  const username = $('username').value.trim().replace(/^@+/, '');
+  if(!username) return;
+  selectedUser = null;
+  $('exchangeBtn').disabled = true;
+  $('userResult').classList.add('hidden');
+  $('searchStatus').textContent = `Searching @${username}...`;
+  $('searchBtn').disabled = true;
+
+  try{
+    const r = await fetch(`/api/tiktok-user?username=${encodeURIComponent(username)}`);
+    const data = await r.json();
+    if(!r.ok) throw new Error(data.error || 'User lookup failed');
+    selectedUser = data;
+    $('avatar').src = data.avatar || 'https://www.tiktok.com/favicon.ico';
+    $('displayName').textContent = data.displayName || data.username;
+    $('handle').textContent = '@'+data.username;
+    $('userResult').classList.remove('hidden');
+    $('searchStatus').textContent = 'User found';
+    $('exchangeBtn').disabled = false;
+  }catch(err){
+    $('searchStatus').textContent = err.message;
+  }finally{
+    $('searchBtn').disabled = false;
+  }
+});
+
+$('exchangeBtn').addEventListener('click',()=>{
+  if(!selectedUser) return;
+  show('processingScreen');
+  setTimeout(()=>{
+    const c = coins();
+    const amount = c*RATE;
+    $('doneCoinsTop').textContent = `${fmtCoins(c)} Coins`;
+    $('doneAvatar').src = selectedUser.avatar || 'https://www.tiktok.com/favicon.ico';
+    $('doneHandle').textContent = '@'+selectedUser.username;
+    $('receiptRecipient').textContent = '@'+selectedUser.username;
+    $('receiptCoins').textContent = `${fmtCoins(c)} Coins`;
+    $('receiptAmount').textContent = fmtMoney(amount);
+    $('receiptTime').textContent = new Date().toLocaleString('en-US');
+    show('completeScreen');
+  }, 2200);
+});
+
+$('backBtn').addEventListener('click',()=>show('exchangeScreen'));
+refresh();
